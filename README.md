@@ -75,3 +75,4 @@ Open http://127.0.0.1:8000 in your browser.
 | GET    | `/`     | Renders the email input form       |
 | POST   | `/send` | Validates email and sends resume   |
 # mail-service
+# mail-service
