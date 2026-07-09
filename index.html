@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Send Resume — Chandan Shah</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    // ── EmailJS config ──────────────────────────────────────────────
+    // Replace these three values after setting up EmailJS (see README)
+    const EMAILJS_PUBLIC_KEY  = "YOUR_PUBLIC_KEY";
+    const EMAILJS_SERVICE_ID  = "YOUR_SERVICE_ID";
+    const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
+    // ───────────────────────────────────────────────────────────────
+
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+
+    function validateEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    async function sendResume(e) {
+      e.preventDefault();
+
+      const emailInput = document.getElementById("email");
+      const btn        = document.getElementById("submit-btn");
+      const msgBox     = document.getElementById("message");
+
+      const recipient = emailInput.value.trim();
+
+      // Clear previous message
+      msgBox.className = "alert hidden";
+      msgBox.textContent = "";
+
+      if (!validateEmail(recipient)) {
+        msgBox.textContent = "Please enter a valid email address.";
+        msgBox.className = "alert error";
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Sending…";
+
+      try {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          to_email: recipient,
+        });
+
+        msgBox.textContent = `Email sent successfully to ${recipient}!`;
+        msgBox.className = "alert success";
+        emailInput.value = "";
+      } catch (err) {
+        console.error("EmailJS error:", err);
+        msgBox.textContent = "Failed to send email. Please try again.";
+        msgBox.className = "alert error";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Send Resume";
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="card">
+    <h1>Send My Resume</h1>
+    <p class="subtitle">Enter a recruiter's email to send my resume directly.</p>
+
+    <div id="message" class="alert hidden"></div>
+
+    <form onsubmit="sendResume(event)">
+      <label for="email">Recipient Email</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        placeholder="recruiter@company.com"
+        required
+        autofocus
+      />
+      <button type="submit" id="submit-btn">Send Resume</button>
+    </form>
+  </div>
+</body>
+</html>
